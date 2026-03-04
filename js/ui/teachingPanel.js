@@ -273,18 +273,73 @@ export const renderAsyncTimeline = (timeline) => {
 // ─── Concept code block formatting ────────────────────────────────────────────
 /**
  * Basic syntax highlighting for code strings.
- * TEACHING: String.replace() with regex — transforms text patterns.
+ * TEACHING: Character-by-character tokenizer — avoids regex matching inside
+ * already-emitted <span> attributes (which the old regex approach broke).
+ * Processes the source left-to-right, emitting one token type at a time.
  */
 const syntaxHighlight = (code) => {
   if (!code) return '';
-  return code
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/(\/\/[^\n]*)/g,                '<span class="sh-comment">$1</span>')
-    .replace(/\b(const|let|var|function|return|async|await|if|else|for|while|new|class|import|export|default|try|catch|throw)\b/g,
-             '<span class="sh-keyword">$1</span>')
-    .replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)/g,
-             '<span class="sh-string">$1</span>')
-    .replace(/\b(\d+)\b/g, '<span class="sh-number">$1</span>');
+
+  const KEYWORDS = new Set([
+    'const','let','var','function','return','async','await',
+    'if','else','for','while','new','class','import','export',
+    'default','try','catch','throw','typeof','instanceof','in','of',
+  ]);
+
+  // HTML-escape a raw string (safe for use inside element text content)
+  const esc = (s) => s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  let out = '';
+  let i   = 0;
+
+  while (i < code.length) {
+    // ── Line comment (//) ───────────────────────────────────────────────────
+    if (code[i] === '/' && code[i + 1] === '/') {
+      let j = i;
+      while (j < code.length && code[j] !== '\n') j++;
+      out += `<span class="sh-comment">${esc(code.slice(i, j))}</span>`;
+      i = j;
+
+    // ── String literal (", ', `) ────────────────────────────────────────────
+    } else if (code[i] === '"' || code[i] === "'" || code[i] === '`') {
+      const q = code[i];
+      let j = i + 1;
+      while (j < code.length) {
+        if (code[j] === '\\') { j += 2; continue; }
+        if (code[j] === q)    { j++;    break;    }
+        j++;
+      }
+      out += `<span class="sh-string">${esc(code.slice(i, j))}</span>`;
+      i = j;
+
+    // ── Numeric literal ─────────────────────────────────────────────────────
+    } else if (/[0-9]/.test(code[i]) && (i === 0 || !/\w/.test(code[i - 1]))) {
+      let j = i;
+      while (j < code.length && /[0-9.]/.test(code[j])) j++;
+      out += `<span class="sh-number">${esc(code.slice(i, j))}</span>`;
+      i = j;
+
+    // ── Identifier or keyword ───────────────────────────────────────────────
+    } else if (/[a-zA-Z_$]/.test(code[i])) {
+      let j = i;
+      while (j < code.length && /[\w$]/.test(code[j])) j++;
+      const word = code.slice(i, j);
+      out += KEYWORDS.has(word)
+        ? `<span class="sh-keyword">${esc(word)}</span>`
+        : esc(word);
+      i = j;
+
+    // ── Any other character ─────────────────────────────────────────────────
+    } else {
+      out += esc(code[i]);
+      i++;
+    }
+  }
+
+  return out;
 };
 
 /**

@@ -139,6 +139,38 @@ export const renderEnemies = (enemies) => {
   }).join('');
 };
 
+// ─── Damage float numbers ─────────────────────────────────────────────────────
+/**
+ * Show a floating damage number over an entity card.
+ * TEACHING: Uses DOM createElement, CSS animations, and setTimeout.
+ */
+export const showDamageFloat = (entityId, amount, isCrit = false) => {
+  const card = document.querySelector(`[data-enemy-id="${entityId}"]`)
+             || document.getElementById('player-card');
+  if (!card) return;
+
+  card.classList.remove('hit');
+  void card.offsetWidth; // force reflow to restart animation
+  card.classList.add('hit');
+
+  const float = document.createElement('div');
+  float.className = `damage-float${isCrit ? ' crit' : ''}`;
+  float.textContent = `-${amount}`;
+  card.appendChild(float);
+
+  // TEACHING: setTimeout with closure — remove element after animation ends
+  setTimeout(() => float.remove(), 900);
+};
+
+/** Flash the player card when taking a hit. */
+export const flashPlayerHit = () => {
+  const card = document.getElementById('player-card');
+  if (!card) return;
+  card.classList.remove('player-hit');
+  void card.offsetWidth;
+  card.classList.add('player-hit');
+};
+
 // ─── Combat log ───────────────────────────────────────────────────────────────
 const MAX_LOG_DISPLAY = 50;
 let _logEntries = [];
@@ -307,11 +339,14 @@ export const hideExerciseModal = () => {
   if (modal) modal.hidden = true;
 };
 
-export const showExerciseFeedback = (result) => {
+export const showExerciseFeedback = (result, proceedsToNextLevel = false) => {
   const fb = $('exercise-feedback');
   if (!fb) return;
+  const nextBtn = result.pass && proceedsToNextLevel
+    ? `<button class="btn btn-primary btn-xs btn-next-after-exercise" style="margin-top:8px">Next Level →</button>`
+    : '';
   fb.innerHTML = `<div class="feedback ${result.pass ? 'feedback-pass' : 'feedback-fail'}">
-  ${result.message}
+  ${result.message}${nextBtn}
 </div>`;
 };
 
@@ -379,6 +414,11 @@ export const initRenderer = (engine) => {
   // ── Wire up all button event listeners ────────────────────────────────────
   _wireButtons(engine);
 };
+
+// ─── Exercise advancement flag ────────────────────────────────────────────────
+// True when the exercise was triggered from the "Next Level" button in the
+// Level Complete modal — closing/skipping it should start the next level.
+let _exerciseProceedsToNextLevel = false;
 
 // ─── Button wiring ────────────────────────────────────────────────────────────
 const _wireButtons = (engine) => {
@@ -521,34 +561,33 @@ const _wireButtons = (engine) => {
 
     // TEACHING: eval() runs the student's code — used here in a controlled
     // educational sandbox. Never use eval() with untrusted input in production!
+    //
+    // FIX: convert const/let → var so that eval() can expose the declarations
+    // to the enclosing test-function scope (const/let are block-scoped in eval).
+    const execCode = fullCode
+      .replace(/\bconst\b/g, 'var')
+      .replace(/\blet\b/g, 'var');
+
     let result;
     try {
-      // The testFn is a self-contained function string
-      const testBody = exercise.testFn
-        .replace('eval(code)', `(function(){${fullCode}})()`)
-        .replace(/\bcode\b/g, JSON.stringify(fullCode));
-
       // eslint-disable-next-line no-new-func
       const testFunc = new Function('code', exercise.testFn);
-      result = testFunc(fullCode);
+      result = testFunc(execCode);
     } catch (err) {
       result = { pass: false, message: `❌ Runtime error: ${err.message}` };
     }
 
-    showExerciseFeedback(result);
+    showExerciseFeedback(result, _exerciseProceedsToNextLevel);
 
     if (result.pass) {
       const xp = exercise.xpReward || 50;
       showXP(xp);
       const player = GameState.get('player');
       if (player) {
-        const { addXP } = window._playerModule || {};
-        // Update player XP directly
-        const { xp: newXp, xpToNextLevel: nextLevel, level, ...rest } =
-          GameState.get('player');
-        let totalXp = newXp + xp;
-        let newLevel = level;
-        let newNextLevel = nextLevel;
+        const { xp: curXp, xpToNextLevel: curXpToNext, level: curLevel } = GameState.get('player');
+        let totalXp = curXp + xp;
+        let newLevel = curLevel;
+        let newNextLevel = curXpToNext;
         let leveledUp = false;
         while (totalXp >= newNextLevel) {
           totalXp -= newNextLevel;
@@ -576,14 +615,21 @@ const _wireButtons = (engine) => {
   });
 
   // ── Exercise: close ───────────────────────────────────────────────────────
-  $('btn-close-exercise')?.addEventListener('click', () => hideExerciseModal());
+  $('btn-close-exercise')?.addEventListener('click', async () => {
+    // If this exercise was triggered by "Next Level", proceed to next level.
+    const proceeds = _exerciseProceedsToNextLevel;
+    _exerciseProceedsToNextLevel = false;
+    hideExerciseModal();
+    if (proceeds) await engine.nextLevel();
+  });
 
   // ── Level complete: next level ────────────────────────────────────────────
   $('btn-next-level')?.addEventListener('click', async () => {
     hideLevelCompleteModal();
-    // Show exercise first
+    // Show exercise first, then advance after the exercise is closed/skipped.
     const levelData = LEVELS.find(l => l.id === GameState.get('currentLevel'));
     if (levelData?.exercise) {
+      _exerciseProceedsToNextLevel = true;
       showExerciseModal(levelData.exercise);
     } else {
       await engine.nextLevel();
@@ -609,12 +655,12 @@ const _wireButtons = (engine) => {
   });
 
   // ── Exercise: after completing, proceed to next level ─────────────────────
-  // This is called by the "Skip" or after passing the exercise
-  // Wire into exercise feedback pass button dynamically
+  // The "Next Level →" button is injected into exercise-feedback on pass.
   const exerciseFeedback = $('exercise-feedback');
   if (exerciseFeedback) {
     exerciseFeedback.addEventListener('click', async (e) => {
       if (e.target.classList.contains('btn-next-after-exercise')) {
+        _exerciseProceedsToNextLevel = false;
         hideExerciseModal();
         await engine.nextLevel();
       }
