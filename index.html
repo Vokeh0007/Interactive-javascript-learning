@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="JavaScript Mastery Simulator — Learn JavaScript through an interactive browser-based RPG." />
+  <title>⚡ JavaScript Mastery Simulator</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/game.css" />
+  <link rel="stylesheet" href="css/panel.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ═══════════════════════════════════════════════════════════
+       MENU SCREEN
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="menu-screen" class="screen active">
+    <div class="menu-container">
+      <div class="menu-logo">⚡</div>
+      <h1 class="game-title">JavaScript Mastery Simulator</h1>
+      <p class="game-subtitle">Learn JavaScript through interactive gameplay — no lectures, just action.</p>
+
+      <div class="menu-features">
+        <div class="feature-pill">📦 Variables</div>
+        <div class="feature-pill">⚙️ Functions</div>
+        <div class="feature-pill">📋 Arrays</div>
+        <div class="feature-pill">🗃️ Objects</div>
+        <div class="feature-pill">🌊 HOFs</div>
+        <div class="feature-pill">🔒 Closures</div>
+        <div class="feature-pill">🌐 DOM</div>
+        <div class="feature-pill">⏱️ Async</div>
+        <div class="feature-pill">🚀 ES6+</div>
+        <div class="feature-pill">🐛 Debug</div>
+      </div>
+
+      <div id="level-map" class="level-map" role="list" aria-label="Level selection"></div>
+
+      <div class="menu-actions">
+        <button id="btn-start-game" class="btn btn-primary btn-lg">
+          ▶ Begin Adventure
+        </button>
+        <p class="menu-tip">💡 Tip: Open DevTools (F12) to inspect the live DOM as you play!</p>
+      </div>
+    </div>
+  </div><!-- /#menu-screen -->
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       GAME SCREEN
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="game-screen" class="screen">
+
+    <!-- ── Header ────────────────────────────────────────────── -->
+    <header id="game-header" role="banner">
+      <div class="header-left">
+        <span class="game-logo" aria-hidden="true">⚡</span>
+        <span class="header-title">JS Mastery</span>
+        <span id="level-badge" class="level-badge" aria-label="Current level">Level 1</span>
+      </div>
+
+      <div class="header-center" aria-label="Player stats">
+        <div class="stat-group">
+          <label class="stat-label" for="player-hp-bar">HP</label>
+          <div class="bar-wrap" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+            <div id="player-hp-bar" class="bar hp-bar" style="width:100%"></div>
+          </div>
+          <span id="player-hp-text" class="stat-num">100/100</span>
+        </div>
+        <div class="stat-group">
+          <label class="stat-label" for="player-mp-bar">MP</label>
+          <div class="bar-wrap" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+            <div id="player-mp-bar" class="bar mp-bar" style="width:100%"></div>
+          </div>
+          <span id="player-mp-text" class="stat-num">50/50</span>
+        </div>
+        <div class="stat-group">
+          <label class="stat-label" for="player-xp-bar">XP</label>
+          <div class="bar-wrap" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+            <div id="player-xp-bar" class="bar xp-bar" style="width:0%"></div>
+          </div>
+          <span id="player-xp-text" class="stat-num">0</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <span id="player-name-display" class="player-name">Hero</span>
+        <button id="btn-toggle-panel" class="btn btn-icon" title="Toggle Teaching Panel" aria-label="Toggle Teaching Panel" aria-pressed="true">📚</button>
+        <button id="btn-menu" class="btn btn-icon" title="Main Menu" aria-label="Return to Main Menu">🏠</button>
+      </div>
+    </header>
+
+    <!-- ── Main layout ────────────────────────────────────────── -->
+    <div id="main-content">
+
+      <!-- ── Game area (left/center) ──────────────────────────── -->
+      <section id="game-area" aria-label="Battle arena">
+
+        <!-- Concept banner -->
+        <div id="concept-banner" class="concept-banner" role="region" aria-label="Current JavaScript concept">
+          <span id="concept-icon" class="concept-icon" aria-hidden="true">📦</span>
+          <div class="concept-text">
+            <h2 id="concept-title" class="concept-name">JavaScript Concept</h2>
+            <p  id="concept-subtitle" class="concept-tag">Concept description</p>
+          </div>
+          <button id="btn-learn-more" class="btn btn-concept" aria-label="Learn more about this concept">
+            Learn More 📖
+          </button>
+        </div>
+
+        <!-- Battlefield -->
+        <div id="battlefield" class="battlefield" role="region" aria-label="Battlefield">
+          <!-- Enemy zone -->
+          <div id="enemy-zone" class="enemy-zone" role="group" aria-label="Enemies"></div>
+
+          <div class="vs-divider" aria-hidden="true">⚔️</div>
+
+          <!-- Player zone -->
+          <div id="player-zone" class="player-zone" role="region" aria-label="Player">
+            <div id="player-card" class="entity-card player-card">
+              <div class="entity-sprite" aria-hidden="true">🧙</div>
+              <div id="player-display-name" class="entity-name">Hero</div>
+              <div class="entity-stats">
+                <span id="player-hp-display">❤️ 100</span>
+                <span id="player-mp-display">💙 50</span>
+              </div>
+              <div id="player-status-effects" class="status-effects" aria-label="Status effects"></div>
+            </div>
+
+            <div id="inventory-preview" class="inventory-preview">
+              <span class="inv-label">🎒</span>
+              <div id="inventory-items" class="inventory-items" role="group" aria-label="Inventory"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Combat log -->
+        <div id="combat-log" class="combat-log" role="log" aria-label="Battle log" aria-live="polite">
+          <div class="log-header">
+            <span>📜 Battle Log</span>
+            <button id="btn-clear-log" class="btn btn-xs btn-ghost" aria-label="Clear battle log">Clear</button>
+          </div>
+          <div id="log-entries" class="log-entries"></div>
+        </div>
+
+        <!-- Action panel -->
+        <div id="action-panel" class="action-panel" role="region" aria-label="Player actions">
+          <div id="basic-actions" class="action-group">
+            <span class="action-group-label">⚔️ Abilities</span>
+            <div id="action-buttons" class="action-buttons" role="group" aria-label="Combat abilities"></div>
+          </div>
+        </div>
+
+      </section><!-- /#game-area -->
+
+
+      <!-- ── Teaching panel (right sidebar) ──────────────────── -->
+      <aside id="teaching-panel" class="teaching-panel" aria-label="JavaScript Teaching Panel">
+
+        <div class="panel-header">
+          <h2 class="panel-title">🧠 Teaching Mode</h2>
+          <div class="panel-tabs" role="tablist" aria-label="Teaching panel sections">
+            <button class="tab-btn active" data-tab="objects" role="tab" aria-selected="true" aria-controls="tab-objects">Objects</button>
+            <button class="tab-btn" data-tab="arrays"  role="tab" aria-selected="false" aria-controls="tab-arrays">Arrays</button>
+            <button class="tab-btn" data-tab="callstack" role="tab" aria-selected="false" aria-controls="tab-callstack">Stack</button>
+            <button class="tab-btn" data-tab="async"   role="tab" aria-selected="false" aria-controls="tab-async">Async</button>
+          </div>
+        </div>
+
+        <!-- Objects tab -->
+        <div id="tab-objects" class="tab-content active" role="tabpanel" aria-label="Live objects">
+          <div class="section-title">📦 Live Objects</div>
+          <div class="object-display" aria-label="Player object">
+            <div class="object-header">player <span class="type-badge">Object</span></div>
+            <div class="object-body" id="player-object-body">
+              <div class="empty-msg">// loading…</div>
+            </div>
+          </div>
+          <div class="object-display" aria-label="Enemies object">
+            <div class="object-header">enemies <span class="type-badge">Array</span></div>
+            <div class="object-body" id="enemies-object-body">
+              <div class="empty-msg">// no enemies yet</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Arrays tab -->
+        <div id="tab-arrays" class="tab-content" role="tabpanel" aria-label="Live arrays">
+          <div class="section-title">📋 Live Arrays</div>
+
+          <div class="array-display">
+            <div class="array-header">inventory<span class="bracket">[ ]</span></div>
+            <div id="inventory-array-display" class="array-body">
+              <div class="array-empty">[ ]</div>
+            </div>
+          </div>
+
+          <div class="array-display">
+            <div class="array-header">enemies<span class="bracket">[ ]</span></div>
+            <div id="enemies-array-display" class="array-body">
+              <div class="array-empty">[ ]</div>
+            </div>
+          </div>
+
+          <div class="array-display">
+            <div class="array-header">executionLog<span class="bracket">[ ]</span></div>
+            <div id="log-array-display" class="array-body">
+              <div class="array-empty">[ ]</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Call Stack tab -->
+        <div id="tab-callstack" class="tab-content" role="tabpanel" aria-label="Call stack">
+          <div class="section-title">📚 Call Stack</div>
+          <div id="call-stack-display" class="call-stack" aria-label="Simulated call stack">
+            <div class="stack-frame stack-empty">
+              <span class="frame-name">// call stack empty</span>
+            </div>
+          </div>
+
+          <div class="section-title" style="margin-top:14px">📝 Execution Log</div>
+          <div id="execution-log-display" class="execution-log" aria-label="Execution log" aria-live="polite">
+            <div class="exec-empty">// no log entries yet</div>
+          </div>
+        </div>
+
+        <!-- Async tab -->
+        <div id="tab-async" class="tab-content" role="tabpanel" aria-label="Async timeline">
+          <div class="section-title">⏱️ Event Loop Visualization</div>
+
+          <div id="async-timeline-display" class="async-timeline" aria-label="Event loop visualization">
+            <div class="timeline-track">
+              <div class="track-label">Call Stack</div>
+              <div id="async-callstack-track" class="track-items">
+                <div class="timeline-empty">—</div>
+              </div>
+            </div>
+            <div class="timeline-track">
+              <div class="track-label">Web APIs</div>
+              <div id="async-webapi-track" class="track-items">
+                <div class="timeline-empty">—</div>
+              </div>
+            </div>
+            <div class="timeline-track">
+              <div class="track-label">Queue</div>
+              <div id="async-queue-track" class="track-items">
+                <div class="timeline-empty">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-title" style="margin-top:14px">📋 Async Events</div>
+          <div id="async-log" class="async-log" aria-live="polite">
+            <div class="async-empty">// No async events yet. Use Async Blast!</div>
+          </div>
+        </div>
+
+      </aside><!-- /#teaching-panel -->
+
+    </div><!-- /#main-content -->
+  </div><!-- /#game-screen -->
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       CONCEPT MODAL
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="concept-modal" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="modal-concept-title">
+    <div class="modal-box concept-modal-box">
+      <div class="modal-header">
+        <h2 id="modal-concept-title">JavaScript Concept</h2>
+        <button id="btn-close-concept-modal" class="btn btn-icon btn-ghost" aria-label="Close concept modal">✕</button>
+      </div>
+      <div id="modal-concept-body" class="modal-body"></div>
+      <div class="modal-footer">
+        <button id="btn-start-exercise" class="btn btn-primary">Try Exercise ✏️</button>
+        <button id="btn-skip-exercise"  class="btn btn-ghost">Continue Battle</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       EXERCISE MODAL
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="exercise-modal" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="exercise-title">
+    <div class="modal-box exercise-modal-box">
+      <div class="modal-header">
+        <h2 id="exercise-title">Mini Challenge</h2>
+        <span id="exercise-badge" class="exercise-badge" aria-label="XP reward">+50 XP</span>
+      </div>
+      <div class="modal-body">
+        <p id="exercise-description" class="exercise-description"></p>
+        <div class="exercise-code-area">
+          <pre id="exercise-prefix" class="code-prefix"></pre>
+          <textarea id="exercise-input" class="code-input" rows="6" spellcheck="false"
+                    aria-label="Code editor" placeholder="// Write your code here…"></textarea>
+          <pre id="exercise-suffix" class="code-suffix"></pre>
+        </div>
+        <div id="exercise-hint" class="exercise-hint hidden">
+          <span class="hint-icon">💡</span>
+          <span id="hint-text">Hint will appear here</span>
+        </div>
+        <div id="exercise-feedback" class="exercise-feedback" aria-live="assertive"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-run-exercise"   class="btn btn-primary">▶ Run Code</button>
+        <button id="btn-hint"           class="btn btn-outline">💡 Hint</button>
+        <button id="btn-close-exercise" class="btn btn-ghost">Skip</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       LEVEL COMPLETE MODAL
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="level-complete-modal" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="level-complete-heading">
+    <div class="modal-box victory-modal">
+      <div class="victory-header">
+        <div class="victory-icon" aria-hidden="true">🏆</div>
+        <h2 id="level-complete-heading">Level Complete!</h2>
+      </div>
+      <div class="modal-body">
+        <div class="rewards-section">
+          <h3>Rewards Earned</h3>
+          <div id="level-rewards" class="rewards-list"></div>
+        </div>
+        <div class="concept-mastered-section">
+          <h3>Concept Mastered</h3>
+          <div id="concept-mastered" class="concept-mastered-badge"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-next-level"   class="btn btn-primary btn-lg">Next Level →</button>
+        <button id="btn-replay-level" class="btn btn-outline">Replay</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       GAME OVER MODAL
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="game-over-modal" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="game-over-heading">
+    <div class="modal-box game-over-modal">
+      <div class="game-over-header">
+        <div class="game-over-icon" aria-hidden="true">💀</div>
+        <h2 id="game-over-heading">Game Over</h2>
+      </div>
+      <div class="modal-body">
+        <p id="game-over-message">Your hero has fallen. Study the concept and try again!</p>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-retry"   class="btn btn-primary">Try Again</button>
+        <button id="btn-go-menu" class="btn btn-ghost">Main Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification container -->
+  <div id="notification-container" class="notification-container" aria-live="polite" aria-atomic="false"></div>
+
+</div><!-- /#app -->
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
