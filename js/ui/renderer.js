@@ -319,7 +319,9 @@ export const showExerciseModal = (exercise) => {
   const hint   = $('hint-text');
 
   if (title)  title.textContent  = exercise.title;
-  if (desc)   desc.textContent   = exercise.description;
+  // exercise.description is always sourced from the static levels.js data file,
+  // never from user input — innerHTML is safe for this trusted content.
+  if (desc)   desc.innerHTML     = exercise.description;
   if (prefix) prefix.textContent = exercise.prefix  || '';
   if (input)  input.value        = exercise.starterCode || '';
   if (suffix) suffix.textContent = exercise.suffix  || '';

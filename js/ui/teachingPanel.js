@@ -354,6 +354,11 @@ export const renderConceptModal = (concept) => {
 
   body.innerHTML = `
 <div class="concept-tagline">${concept.tagline}</div>
+${concept.analogy ? `
+<div class="concept-analogy">
+  <span class="analogy-icon">💡</span>
+  <div class="analogy-text">${concept.analogy}</div>
+</div>` : ''}
 <div class="concept-explanation">${concept.explanation}</div>
 ${concept.codeExample ? `
 <div class="concept-code-section">

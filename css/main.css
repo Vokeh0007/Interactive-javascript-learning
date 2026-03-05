@@ -478,6 +478,37 @@ pre {
   border-bottom: 1px solid var(--clr-border);
 }
 
+/* Analogy box — the memorable real-world comparison */
+.concept-analogy {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+  background: linear-gradient(135deg, rgba(88,166,255,0.08) 0%, rgba(163,113,247,0.08) 100%);
+  border: 1px solid rgba(88,166,255,0.25);
+  border-left: 4px solid var(--clr-accent);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+.analogy-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(88,166,255,0.4));
+}
+.analogy-text { color: var(--clr-text); }
+.analogy-text strong { color: var(--clr-accent); }
+.analogy-text code   {
+  background: rgba(88,166,255,0.1);
+  border: 1px solid rgba(88,166,255,0.2);
+  border-radius: 3px;
+  padding: 0 4px;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--clr-accent);
+}
+
 .concept-explanation {
   color: var(--clr-text);
   line-height: 1.8;
@@ -485,6 +516,15 @@ pre {
 }
 .concept-explanation strong { color: var(--clr-accent); }
 .concept-explanation em     { color: var(--clr-yellow); font-style: normal; font-weight: 600; }
+.concept-explanation code   {
+  background: rgba(88,166,255,0.1);
+  border: 1px solid rgba(88,166,255,0.2);
+  border-radius: 3px;
+  padding: 0 4px;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--clr-accent);
+}
 
 .concept-code-section { display: flex; flex-direction: column; gap: var(--sp-2); }
 .code-label           { font-size: 0.75rem; color: var(--clr-text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
@@ -523,8 +563,19 @@ pre {
 }
 .exercise-description {
   color: var(--clr-text);
-  line-height: 1.7;
+  line-height: 1.8;
   font-size: 0.9rem;
+}
+.exercise-description strong { color: var(--clr-accent); }
+.exercise-description em     { color: var(--clr-yellow); font-style: normal; }
+.exercise-description code   {
+  background: rgba(88,166,255,0.1);
+  border: 1px solid rgba(88,166,255,0.2);
+  border-radius: 3px;
+  padding: 0 4px;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--clr-accent);
 }
 .exercise-code-area {
   display: flex;
