@@ -630,17 +630,17 @@ btn.addEventListener('click', () => {
     ],
     exercise: {
       title: 'DOM Query',
-      description: `Practice selecting elements from the live game page! Follow these steps:
-1️⃣  Use <code>document.querySelector("#game-header")</code> to select the header element and store it in <code>header</code>
-2️⃣  Use <code>document.querySelectorAll(".tab-btn")</code> to select ALL tab buttons and store them in <code>tabs</code>
+      description: `Practice selecting elements from the live page! Follow these steps:
+1️⃣  Use <code>document.querySelector("#game-header")</code> to select the lesson header element and store it in <code>header</code>
+2️⃣  Use <code>document.querySelectorAll(".tab-btn")</code> to select ALL module navigation items and store them in <code>tabs</code>
 
 <em>querySelector returns ONE element. querySelectorAll returns ALL matches as a NodeList (like an array).</em>`,
-      context: '// Level 7 Exercise — DOM Manipulation',
+      context: '// Module 7 Exercise — DOM Manipulation',
       prefix: '',
-      starterCode: `// Step 1: Select the element with id "game-header"
+      starterCode: `// Step 1: Select the lesson header element (id="game-header")
 const header = document.querySelector("#game-header");
 
-// Step 2: Select ALL elements with class "tab-btn"
+// Step 2: Select ALL module navigation items (class="tab-btn")
 const tabs = document.querySelectorAll(".tab-btn");
 `,
       suffix: '',
