@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="JavaScript Learning Platform — Learn JavaScript from basics to mastery with hands-on coding challenges." />
+  <title>⚡ JavaScript Learning Platform</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/platform.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ═══════════════════════════════════════════════════════════
+       DASHBOARD SCREEN — Curriculum overview
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="dashboard-screen" class="screen active">
+
+    <header class="plat-header" role="banner">
+      <div class="plat-brand">
+        <span class="plat-brand-icon" aria-hidden="true">⚡</span>
+        <span class="plat-brand-name">JavaScript Learning Platform</span>
+      </div>
+      <div id="dash-progress-text" class="plat-header-stat">0 / 10 modules completed</div>
+    </header>
+
+    <main class="dashboard-main">
+
+      <div class="curriculum-hero">
+        <h1 class="curriculum-title">JavaScript Fundamentals</h1>
+        <p class="curriculum-desc">
+          10 structured modules — from variables to async patterns.
+          Read the concept, grasp the analogy, then write real code.
+        </p>
+        <div class="curriculum-progress-row">
+          <div class="progress-track">
+            <div id="dash-progress-bar" class="progress-fill" style="width:0%"></div>
+          </div>
+          <span id="dash-progress-label" class="progress-pct">0%</span>
+        </div>
+        <div class="curriculum-topics">
+          <span class="topic-pill">📦 Variables</span>
+          <span class="topic-pill">⚙️ Functions</span>
+          <span class="topic-pill">📋 Arrays</span>
+          <span class="topic-pill">🗃️ Objects</span>
+          <span class="topic-pill">🌊 HOFs</span>
+          <span class="topic-pill">🔒 Closures</span>
+          <span class="topic-pill">🌐 DOM</span>
+          <span class="topic-pill">⏱️ Async</span>
+          <span class="topic-pill">🚀 ES6+</span>
+          <span class="topic-pill">🐛 Debug</span>
+        </div>
+      </div>
+
+      <div id="module-grid" class="module-grid" role="list" aria-label="Curriculum modules"></div>
+
+    </main>
+  </div><!-- /#dashboard-screen -->
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       LESSON SCREEN — Module content + challenge
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="lesson-screen" class="screen">
+
+    <!-- Lesson header bar — id="game-header" kept for DOM exercise compat -->
+    <header id="game-header" class="lesson-header-bar" role="banner">
+      <button id="btn-back-dashboard" class="btn btn-ghost btn-sm lesson-back-btn" aria-label="Back to curriculum">
+        ← Curriculum
+      </button>
+      <div class="lesson-header-info">
+        <span id="lesson-module-num" class="lesson-module-num">Module 1</span>
+        <h1 id="lesson-header-title" class="lesson-header-title">Variables &amp; Data Types</h1>
+      </div>
+      <div id="lesson-progress-text" class="lesson-header-progress">1 / 10</div>
+    </header>
+
+    <div class="lesson-layout">
+
+      <!-- Left sidebar: module navigation -->
+      <!-- nav items get class "tab-btn" for DOM exercise compat -->
+      <nav id="lesson-nav" class="lesson-nav" aria-label="Module navigation">
+        <div class="nav-section-label">Curriculum</div>
+        <ul id="nav-module-list" class="nav-module-list" role="list"></ul>
+      </nav>
+
+      <!-- Main lesson content (scrollable) -->
+      <main id="lesson-content" class="lesson-content">
+
+        <!-- Module concept heading -->
+        <div class="lesson-concept-header">
+          <span id="lesson-concept-icon" class="lesson-concept-icon" aria-hidden="true">📦</span>
+          <div>
+            <h2 id="lesson-concept-name" class="lesson-concept-name">Variables &amp; Data Types</h2>
+            <p  id="lesson-concept-tagline" class="lesson-concept-tagline">Store values, give them names.</p>
+          </div>
+        </div>
+
+        <!-- Analogy box (reuses existing .concept-analogy styles from main.css) -->
+        <div id="lesson-analogy" class="concept-analogy lesson-section">
+          <span class="analogy-icon">💡</span>
+          <div id="lesson-analogy-text" class="analogy-text"></div>
+        </div>
+
+        <!-- Explanation -->
+        <section class="lesson-section">
+          <h3 class="section-heading">📖 Explanation</h3>
+          <div id="lesson-explanation" class="lesson-explanation concept-explanation"></div>
+        </section>
+
+        <!-- Code Example -->
+        <section id="lesson-code-section" class="lesson-section">
+          <h3 class="section-heading">💻 Code Example</h3>
+          <div class="code-label">JavaScript</div>
+          <pre class="concept-code"><code id="lesson-code-example"></code></pre>
+        </section>
+
+        <!-- Coding Challenge -->
+        <section class="lesson-section challenge-section" id="challenge-section">
+          <h3 class="section-heading">✏️ Coding Challenge</h3>
+          <div class="challenge-card">
+            <div class="challenge-card-header">
+              <span id="challenge-title" class="challenge-title">Challenge</span>
+              <span id="challenge-xp"    class="exercise-badge">+50 XP</span>
+            </div>
+            <p id="challenge-description" class="exercise-description"></p>
+
+            <div class="exercise-code-area">
+              <pre id="challenge-prefix" class="code-prefix"></pre>
+              <textarea id="challenge-input" class="code-input" rows="8" spellcheck="false"
+                        aria-label="Code editor" placeholder="// Write your JavaScript here…"></textarea>
+              <pre id="challenge-suffix" class="code-suffix"></pre>
+            </div>
+
+            <div id="challenge-hint" class="exercise-hint hidden">
+              <span class="hint-icon">💡</span>
+              <span id="challenge-hint-text"></span>
+            </div>
+            <div id="challenge-feedback" class="exercise-feedback" aria-live="assertive"></div>
+
+            <div class="challenge-actions">
+              <button id="btn-run-challenge"   class="btn btn-primary">▶ Run Code</button>
+              <button id="btn-show-hint"       class="btn btn-outline">💡 Hint</button>
+              <button id="btn-reset-challenge" class="btn btn-ghost">↺ Reset</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Module navigation footer -->
+        <div class="lesson-footer-nav">
+          <button id="btn-prev-module" class="btn btn-outline">← Previous</button>
+          <button id="btn-next-module" class="btn btn-primary">Next Module →</button>
+        </div>
+
+      </main><!-- /#lesson-content -->
+    </div><!-- /.lesson-layout -->
+  </div><!-- /#lesson-screen -->
+
+  <!-- Toast notifications -->
+  <div id="notification-container" class="notification-container" aria-live="polite" aria-atomic="false"></div>
+
+</div><!-- /#app -->
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
